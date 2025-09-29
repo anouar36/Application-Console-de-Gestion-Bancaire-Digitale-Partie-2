@@ -1,12 +1,11 @@
 package org.example.View;
 
-import org.example.Controller.AccountController;
-import org.example.Controller.AuthController;
-import org.example.Controller.ClientController;
-import org.example.Controller.CreditController;
+import org.example.Controller.*;
 import org.example.Modle.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
@@ -16,33 +15,36 @@ public class Main {
     private static ClientController clientController = new ClientController();
     private static AccountController accountController = new AccountController();
     private static CreditController creditController = new CreditController();
+    private static TransactionController transactionController = new TransactionController();
+
 
 
     public static void main(String[] args) {
-        while (true) {
+        //while (true) {
 
-            System.out.println("===================================");
-            System.out.println("      WELCOME TO BANK SYSTEM       ");
-            System.out.println("===================================");
+            //     System.out.println("===================================");
+            //     System.out.println("      WELCOME TO BANK SYSTEM       ");
+            //    System.out.println("===================================");
 
-            System.out.println("pleas entre your email user:");
-            String email = scanner.next();
+            //     System.out.println("pleas entre your email user:");
+            //     String email = scanner.next();
 
-            System.out.println("pleas entre your password user:");
-            String password = scanner.next();
+            //    System.out.println("pleas entre your password user:");
+            //    String password = scanner.next();
 
-            String userAuth = authController.login(email, password);
-            System.out.println("===================================");
-            System.out.println("      " + userAuth + "      ");
-            System.out.println("===================================");
+            //     String userAuth = authController.login(email, password);
+            //    System.out.println("===================================");
+            //     System.out.println("      " + userAuth + "      ");
+            //     System.out.println("===================================");
 
-            if (userAuth.toUpperCase().contains("ADMIN")) {
-                adminMenu();
-            } else {
-                System.out.println("SORRY YOU ARE OUT AT SYSTEM!\n");
-            }
+            //    if (userAuth.toUpperCase().contains("ADMIN")) {
+                //         adminMenu();
+                //    } else {
+                //        System.out.println("SORRY YOU ARE OUT AT SYSTEM!\n");
+                //     }
 
-        }
+       //}
+            adminMenu();
     }
 
     //admin menu
@@ -54,6 +56,8 @@ public class Main {
             System.out.println("3. Creat Client");
             System.out.println("4. Creat Account");
             System.out.println("5. credit Request");
+            System.out.println("6. validtion credit : ("+getcount()+")");
+            System.out.println("7. deposit");
 
             System.out.println("Please entre your choice: ");
             int choice = scanner.nextInt();
@@ -79,8 +83,12 @@ public class Main {
                     navigate();
                     break;
                 case 6:
+                    validationCredit();
+                    navigate();
                     break;
                 case 7:
+                    deposit();
+                    navigate();
                     break;
                 case 8:
                     break;
@@ -222,8 +230,64 @@ public class Main {
     }
 
     public static void validationCredit(){
+        ArrayList<Credit> credits =creditController.getcreditsRequest();
+        credits.forEach(credit -> {
+            System.out.println("Credit ID        : " + credit.getCreditId());
+            System.out.println("Amount           : " + credit.getAmount());
+            System.out.println("Linked Account   : " + credit.getLinkedAccount());
+            System.out.println("Duration (Months): " + credit.getDurationMonths());
+            System.out.println("Currency Type    : " + credit.getCurrencyType());
+            System.out.println("Interest Rate    : " + credit.getInterestRate());
+            System.out.println("Status           : " + credit.getStatus());
+            System.out.println("--------------------------------------------------");
+        });
+        System.out.println("Enter RIB account to validate credit: ");
+        String rib = scanner.next();
+        String res = creditController.validationCredit(rib);
+        System.out.println(res);
 
     }
+
+    public static void deposit() {
+        BigDecimal amount = null;
+
+        while (amount == null) {
+            try {
+                System.out.print("Enter amount: ");
+                amount = scanner.nextBigDecimal();
+                scanner.nextLine();
+
+                System.out.print("Enter currency (1.MAD, 2.EUR, 3.USD): ");
+                int currency = scanner.nextInt();
+                scanner.nextLine();
+
+                System.out.print("Enter RIB: ");
+                String rib = scanner.nextLine();
+
+
+
+            } catch (Exception e) {
+                System.out.println("Invalid input, please try again.");
+                scanner.nextLine();
+                amount = null;
+            }
+        }
+
+
+
+    }
+    public  static void withdraw(){}
+    public  static void transferInternal(){}
+    public  static void transferExternal(){}
+
+    public static int getcount(){
+        Optional<ArrayList<Credit>> creditsOptional = Optional.ofNullable(creditController.getcreditsRequest());
+
+        return creditsOptional.map(ArrayList::size).orElse(0);
+
+    }
+
+
 
 
 

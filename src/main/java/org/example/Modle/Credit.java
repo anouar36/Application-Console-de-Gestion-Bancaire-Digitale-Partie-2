@@ -1,18 +1,21 @@
 package org.example.Modle;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class Credit {
-    private String creditId;
+
+    private int creditId;
     private BigDecimal amount;
-    private double interestRate;
+    private BigDecimal interestRate;
     private int durationMonths;
     private CreditStatus status;
-    private Account linkedAccount;
+    private String linkedAccount;
     private CurrencyType currencyType;
+    private BigDecimal interestRateMonth;
 
 
-    public Credit(String creditId, BigDecimal amount, double interestRate, int durationMonths, CreditStatus status, Account linkedAccount, CurrencyType currencyType) {
+    public Credit(int creditId, BigDecimal amount, BigDecimal interestRate, int durationMonths, CreditStatus status, String linkedAccount, CurrencyType currencyType,BigDecimal interestRateMonth) {
         this.creditId = creditId;
         this.amount = amount;
         this.interestRate = interestRate;
@@ -20,9 +23,10 @@ public class Credit {
         this.status = status;
         this.linkedAccount = linkedAccount;
         this.currencyType = currencyType;
+        this.interestRateMonth = interestRateMonth;
     }
 
-    public String getCreditId() {
+    public int getCreditId() {
         return creditId;
     }
 
@@ -30,7 +34,7 @@ public class Credit {
         return amount;
     }
 
-    public double getInterestRate() {
+    public BigDecimal getInterestRate() {
         return interestRate;
     }
 
@@ -42,7 +46,7 @@ public class Credit {
         return status;
     }
 
-    public Account getLinkedAccount() {
+    public String  getLinkedAccount() {
         return linkedAccount;
     }
 
