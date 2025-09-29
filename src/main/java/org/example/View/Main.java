@@ -3,20 +3,11 @@ package org.example.View;
 import org.example.Controller.AccountController;
 import org.example.Controller.AuthController;
 import org.example.Controller.ClientController;
+import org.example.Controller.CreditController;
 import org.example.Modle.*;
-import org.example.Service.AccountService;
-import org.example.Service.AuthService;
-import org.example.Service.ClientService;
-import org.example.dao.JDBC;
 
-import javax.swing.*;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.util.Scanner;
-
-import static org.example.Modle.Role.*;
 
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
@@ -24,7 +15,7 @@ public class Main {
     private static AuthController authController = new AuthController();
     private static ClientController clientController = new ClientController();
     private static AccountController accountController = new AccountController();
-    private  static  CreditController creditController = new CreditController();
+    private static CreditController creditController = new CreditController();
 
 
     public static void main(String[] args) {
@@ -55,13 +46,14 @@ public class Main {
     }
 
     //admin menu
-    public static void adminMenu(){
+    public static void adminMenu() {
 
         while (true) {
             System.out.println("1. show profile");
             System.out.println("2. Add Employee");
             System.out.println("3. Creat Client");
             System.out.println("4. Creat Account");
+            System.out.println("5. credit Request");
 
             System.out.println("Please entre your choice: ");
             int choice = scanner.nextInt();
@@ -83,7 +75,7 @@ public class Main {
                     navigate();
                     break;
                 case 5:
-
+                    creditRequest();
                     navigate();
                     break;
                 case 6:
@@ -104,47 +96,50 @@ public class Main {
 
     }
 
-     public static void navigate(){
+    public static void navigate() {
         System.out.println("If you want to continue, click B.");
         scanner.next();
     }
-     public static void showProfile(){
-         System.out.println("name : "+user.getName());
-         System.out.println("name : "+user.getEmail());
-         System.out.println("name : "+user.getPassword());
-         System.out.println("name : "+user.getRole());
 
-     }
-     public static void addEmployee(){
+    public static void showProfile() {
+        System.out.println("name : " + user.getName());
+        System.out.println("name : " + user.getEmail());
+        System.out.println("name : " + user.getPassword());
+        System.out.println("name : " + user.getRole());
+
+    }
+
+    public static void addEmployee() {
 
         boolean index = true;
-        while (index){
+        while (index) {
             System.out.println("entre Nome : ");
-            String name =scanner.next();
+            String name = scanner.next();
             System.out.println("entre email :");
             String email = scanner.next();
             System.out.println("entre password : ");
             String password = scanner.next();
             System.out.println("entre  role: \n1.AUDITOR\n2.TELLER\n3.MANAGER\n4.ADMIN");
-            int roleInt  = scanner.nextInt();
+            int roleInt = scanner.nextInt();
 
-            String rs= authController.regester(name,email,password,roleInt);
+            String rs = authController.regester(name, email, password, roleInt);
             System.out.println(rs);
-            if(rs.contains("added successfully!")){
-                index=false;
+            if (rs.contains("added successfully!")) {
+                index = false;
             }
         }
-     }
-     public static void creatClient(){
-        int index =0;
-        String clike="";
-        while(true) {
+    }
 
-            if(index>=1){
+    public static void creatClient() {
+        int index = 0;
+        String clike = "";
+        while (true) {
+
+            if (index >= 1) {
                 System.out.println("for out click C ");
-                 clike = scanner.next();
+                clike = scanner.next();
             }
-            if(clike.equals("c")){
+            if (clike.equals("c")) {
                 break;
             }
             System.out.println("entre name: ");
@@ -155,17 +150,18 @@ public class Main {
             String adress = scanner.next();
 
             String res = clientController.addClient(name, email, adress);
-            if(res.contains("Was not added successfully")){
+            if (res.contains("Was not added successfully")) {
                 index++;
             }
         }
 
-     }
-     public static void creatAccont(){
-        int index =0;
-        String out="";
+    }
+
+    public static void creatAccont() {
+        int index = 0;
+        String out = "";
         while (true) {
-            if(index>0){
+            if (index > 0) {
                 System.out.println("if you want out click B");
                 out = scanner.next();
 
@@ -187,12 +183,49 @@ public class Main {
             String result = accountController.creatAccount(balance, typeInt, client, client.getId());
             System.out.println(result);
 
-            if(result.contains("Account created successfully") || out.equals("B")){
+            if (result.contains("Account created successfully") || out.equals("B")) {
                 break;
             }
-            index ++;
+            index++;
         }
-     }
+    }
+
+    public static void creditRequest() {
+        int index =0;
+        String  out = "";
+        while (true) {
+            if(index!=0){
+                System.out.println("For out click B");
+                out="B";
+            }
+            if(out.equals("B")){
+                break;
+            }
+
+            System.out.print("Enter RIB: ");
+            double linkedAccount = scanner.nextDouble();
+
+            System.out.print("Enter Amount: ");
+            BigDecimal amount = scanner.nextBigDecimal();
+
+            System.out.print("Enter the loan duration (in months): ");
+            int durationMonths = scanner.nextInt();
+
+
+            System.out.print("Enter Currency: 1.DOLLAR, 2.DIRHAM, 3.EURO : ");
+            int currencyInt = scanner.nextInt();
+            index ++;
+
+            String rs = creditController.creditRequest(linkedAccount, amount, durationMonths, currencyInt);
+            System.out.println(rs);
+        }
+    }
+
+    public static void validationCredit(){
+
+    }
+
+
 
 
 

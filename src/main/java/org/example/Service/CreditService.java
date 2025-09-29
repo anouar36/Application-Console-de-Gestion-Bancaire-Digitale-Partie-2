@@ -1,5 +1,6 @@
 package org.example.Service;
 
+import org.example.Modle.CurrencyType;
 import org.example.Repository.CreditRepository;
 
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ public class CreditService {
         this.creditRepository = new CreditRepository();
     }
 
-    //public boolean creditRequest(BigDecimal amount, interest_rate,duration_months, status, linked_account ){
-
-    //}
+    public boolean creditRequest(double linked_account , BigDecimal amount, CurrencyType currencyType, BigDecimal interest_rate, BigDecimal interestRateMonth, int duration_months ){
+        return  this.creditRepository.creditRequest(  linked_account ,  amount,  currencyType,  interest_rate,  interestRateMonth,  duration_months);
+    }
 }

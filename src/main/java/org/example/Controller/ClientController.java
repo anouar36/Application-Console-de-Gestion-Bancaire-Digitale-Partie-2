@@ -2,7 +2,7 @@ package org.example.Controller;
 
 import org.example.Modle.Client;
 import org.example.Service.ClientService;
-import org.example.View.Validation.Validation;
+import org.example.Validation.Validation;
 
 public class ClientController {
 
