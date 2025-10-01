@@ -16,27 +16,15 @@ public class CreditController {
         this.creditService = new CreditService();
     }
 
-    public String creditRequest(double linkedAccount, BigDecimal amount,int durationMonths,int currencyInt){
+    public String creditRequest(double linkedAccount, BigDecimal amount,int durationMonths){
         CurrencyType currencyType ;
-        if(!Validation.isCurrencyInt(currencyInt)){
-            return "Please entre number of currency entre menu";
-        }
-        switch (currencyInt){
-            case 1 :currencyType = CurrencyType.DOLLAR  ;
-            break;
-            case 2 :currencyType = CurrencyType.DIRHAM  ;
-            break;
-            case 3 :currencyType = CurrencyType.EURO    ;
-            break;
-            default: currencyType = CurrencyType.DIRHAM ;
-        }
 
 
         int years = durationMonths / 12;
         BigDecimal interestRate = Validation.interestRate(amount,years);
         BigDecimal interestRateMonth = interestRate.divide(new BigDecimal(durationMonths),4,BigDecimal.ROUND_UP);
 
-            boolean rs = creditService.creditRequest(linkedAccount,amount,currencyType,interestRate,interestRateMonth,durationMonths);
+            boolean rs = creditService.creditRequest(linkedAccount,amount,interestRate,interestRateMonth,durationMonths);
 
             if (rs){
                 return "Your request has been processed";

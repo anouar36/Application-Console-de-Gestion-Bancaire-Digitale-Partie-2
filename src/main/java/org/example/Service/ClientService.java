@@ -3,6 +3,8 @@ package org.example.Service;
 import org.example.Modle.Client;
 import org.example.Repository.ClientRepository;
 
+import java.util.ArrayList;
+
 public class ClientService {
     private ClientRepository clientRepository ;
 
@@ -16,5 +18,13 @@ public class ClientService {
 
     public Client getClient(String name,String email){
         return clientRepository.getClient(name,email);
+    }
+
+    public ArrayList<Client> getAllClient(){
+        return clientRepository.getAllClient();
+    }
+    public boolean updateClient(int id,String column , String value){
+        return clientRepository.updateClient( id,column,value);
+
     }
 }

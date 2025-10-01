@@ -18,9 +18,9 @@ import java.util.Date;
 public class CreditRepository {
 
 
-    public boolean creditRequest(double linked_account , BigDecimal amount, CurrencyType currencyType, BigDecimal interest_rate, BigDecimal interestRateMonth, int duration_months ){
+    public boolean creditRequest(double linked_account , BigDecimal amount, BigDecimal interest_rate, BigDecimal interestRateMonth, int duration_months ){
 
-        String sql = "INSERT INTO credit (amount, interest_rate, duration_months, linked_account, currency) VALUES (?,?,?,?,?::currencytype,?)";
+        String sql = "INSERT INTO credit (amount, interest_rate, duration_months, linked_account,interestRateMonth ) VALUES (?,?,?,?,?)";
 
         try (Connection connection = JDBC.getConnection()) {
             PreparedStatement stmt = connection.prepareStatement(sql);
@@ -29,8 +29,8 @@ public class CreditRepository {
             stmt.setBigDecimal(2, interest_rate);
             stmt.setInt(3, duration_months);
             stmt.setDouble(4, linked_account);
-            stmt.setString(5, currencyType.name());
-            stmt.setBigDecimal(6, interestRateMonth);
+
+            stmt.setBigDecimal(5, interestRateMonth);
 
             stmt.executeUpdate();
             return true;

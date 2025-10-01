@@ -7,6 +7,8 @@ import org.example.Service.AccountService;
 import org.example.Validation.Validation;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class AccountController {
     private AccountService accountService;
@@ -49,6 +51,10 @@ public class AccountController {
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
+    }
+
+    public HashMap<String , ArrayList<Account>> listAccounts(){
+        return accountService.listAccounts();
     }
 
 }

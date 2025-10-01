@@ -2,11 +2,13 @@ package org.example.View;
 
 import org.example.Controller.*;
 import org.example.Modle.*;
+import org.example.Validation.SalaryJob;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
@@ -44,22 +46,41 @@ public class Main {
                 //     }
 
        //}
+        try {
+            // تشغيل Scheduler مع البرنامج
+            SalaryJob.startScheduler();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
             adminMenu();
     }
 
     //admin menu
     public static void adminMenu() {
-
         while (true) {
-            System.out.println("1. show profile");
-            System.out.println("2. Add Employee");
-            System.out.println("3. Creat Client");
-            System.out.println("4. Creat Account");
-            System.out.println("5. credit Request");
-            System.out.println("6. validtion credit : ("+getcount()+")");
-            System.out.println("7. deposit");
+            System.out.println("========= ADMIN MENU =========");
+            System.out.println("1  . Show Profile");
+            System.out.println("2  . Add Employee");
+            System.out.println("3  . Create Client");
+            System.out.println("4  . Create Account");
+            System.out.println("5  . Credit Request");
+            System.out.println("6  . Validation Credit : (" + getcount() + ")");
+            System.out.println("7  . Deposit");
+            System.out.println("8  . Withdraw");
+            System.out.println("9  . Transfer Internal");
+            System.out.println("10 . Transfer External");
+            System.out.println("11 . List Accounts");
+            System.out.println("12 . Update Client Profile");
+            System.out.println("13 . Close Account");
+            System.out.println("14 . Transaction History");
+            System.out.println("15 . Credit Follow-up");
+            System.out.println("16 . Repayment Credit");
+            System.out.println("17 . Reports & Statistics");
+            System.out.println("18 . Fees Management");
+            System.out.println("19 . Logout");
+            System.out.println("20 . Exit");
+            System.out.println("Please enter your choice: ");
 
-            System.out.println("Please entre your choice: ");
             int choice = scanner.nextInt();
             switch (choice) {
                 case 1:
@@ -91,24 +112,66 @@ public class Main {
                     navigate();
                     break;
                 case 8:
+                    withdraw();
+                    navigate();
                     break;
                 case 9:
+                    transferInternal();
+                    navigate();
                     break;
                 case 10:
+                    transferExternal();
+                    navigate();
                     break;
                 case 11:
+                    listAccounts();
+                    navigate();
+                    break;
+                case 12:
+                    updateClientProfile();
+                    navigate();
+                    break;
+                case 13:
+                    //closeAccount();
+                    navigate();
+                    break;
+                case 14:
+                    //transactionHistory();
+                    navigate();
+                    break;
+                case 15:
+                    //creditFollowUp();
+                    navigate();
+                    break;
+                case 16:
+                    //repaymentCredit();
+                    navigate();
+                    break;
+                case 17:
+                    //reportsAndStatistics();
+                    navigate();
+                    break;
+                case 18:
+                    //feesManagement();
+                    navigate();
+                    break;
+                case 19:
+                    //logout();
+                    return;
+                case 20:
+                    System.exit(0);
                     break;
                 default:
+                    System.out.println("Invalid choice, please try again!");
             }
         }
-
     }
+
 
     public static void navigate() {
         System.out.println("If you want to continue, click B.");
         scanner.next();
     }
-
     public static void showProfile() {
         System.out.println("name : " + user.getName());
         System.out.println("name : " + user.getEmail());
@@ -116,7 +179,6 @@ public class Main {
         System.out.println("name : " + user.getRole());
 
     }
-
     public static void addEmployee() {
 
         boolean index = true;
@@ -137,7 +199,6 @@ public class Main {
             }
         }
     }
-
     public static void creatClient() {
         int index = 0;
         String clike = "";
@@ -164,7 +225,6 @@ public class Main {
         }
 
     }
-
     public static void creatAccont() {
         int index = 0;
         String out = "";
@@ -197,7 +257,6 @@ public class Main {
             index++;
         }
     }
-
     public static void creditRequest() {
         int index =0;
         String  out = "";
@@ -220,15 +279,12 @@ public class Main {
             int durationMonths = scanner.nextInt();
 
 
-            System.out.print("Enter Currency: 1.DOLLAR, 2.DIRHAM, 3.EURO : ");
-            int currencyInt = scanner.nextInt();
             index ++;
 
-            String rs = creditController.creditRequest(linkedAccount, amount, durationMonths, currencyInt);
+            String rs = creditController.creditRequest(linkedAccount, amount, durationMonths);
             System.out.println(rs);
         }
     }
-
     public static void validationCredit(){
         ArrayList<Credit> credits =creditController.getcreditsRequest();
         credits.forEach(credit -> {
@@ -247,7 +303,6 @@ public class Main {
         System.out.println(res);
 
     }
-
     public static void deposit() {
         BigDecimal amount = null;
 
@@ -257,12 +312,12 @@ public class Main {
                 amount = scanner.nextBigDecimal();
                 scanner.nextLine();
 
-                System.out.print("Enter currency (1.MAD, 2.EUR, 3.USD): ");
-                int currency = scanner.nextInt();
-                scanner.nextLine();
 
                 System.out.print("Enter RIB: ");
                 String rib = scanner.nextLine();
+
+                String rs = transactionController.deposit(amount,rib);
+                System.out.println(rs);
 
 
 
@@ -272,14 +327,155 @@ public class Main {
                 amount = null;
             }
         }
+    }
+    public static void withdraw() {
+        BigDecimal amount = null;
+
+        while (amount == null) {
+            try {
+                System.out.print("Enter amount to withdraw: ");
+                amount = scanner.nextBigDecimal();
+                scanner.nextLine();
+
+                System.out.print("Enter RIB: ");
+                String rib = scanner.nextLine();
+
+                String success = transactionController.withdraw(amount, rib);
+                System.out.println(success);
+
+            } catch (Exception e) {
+                System.out.println("Invalid input, please try again.");
+                scanner.nextLine();
+                amount = null;
+            }
+        }
+    }
+    public static void transferExternal() {
+        BigDecimal amount = null;
+
+        while (amount == null) {
+            try {
+                System.out.print("Enter amount to transfer: ");
+                amount = scanner.nextBigDecimal();
+                scanner.nextLine();
+
+                System.out.print("Enter source RIB: ");
+                String fromRib = scanner.nextLine();
+
+                System.out.print("Enter destination RIB: ");
+                String toRib = scanner.nextLine();
+
+                String success = transactionController.transferExternal(amount, fromRib, toRib);
+                System.out.println(success);
+
+            } catch (Exception e) {
+                System.out.println("Invalid input, please try again.");
+                scanner.nextLine();
+                amount = null;
+            }
+        }
+    }
+    public static void transferInternal() {
+        BigDecimal amount = null;
+
+        while (amount == null) {
+            try {
+                System.out.print("Enter amount to transfer: ");
+                amount = scanner.nextBigDecimal();
+                scanner.nextLine();
+
+                System.out.print("Enter your source RIB: ");
+                String fromRib = scanner.nextLine();
+
+                System.out.print("Enter destination RIB (External Bank): ");
+                String toRib = scanner.nextLine();
 
 
+                String success = transactionController.transferInternal(amount, fromRib, toRib);
+                System.out.println(success);
+
+            } catch (Exception e) {
+                System.out.println("Invalid input, please try again.");
+                scanner.nextLine();
+                amount = null;
+            }
+        }
+    }
+    public static void listAccounts() {
+        HashMap<String, ArrayList<Account>> listAccounts = accountController.listAccounts();
+
+        // Loop through each client
+        for (String clientKey : listAccounts.keySet()) {
+            System.out.println("Client: " + clientKey);
+
+            // Loop through each account of this client
+            ArrayList<Account> accounts = listAccounts.get(clientKey);
+            for (Account account : accounts) {
+                System.out.println("  Account Number: " + account.getAccountId());
+                System.out.println("  Balance: " + account.getBalance());
+                System.out.println("  Type: " + account.getType());
+                System.out.println("-------------------------");
+            }
+        }
+    }
+    public static void updateClientProfile() {
+        ArrayList<Client> clients = clientController.getAllClient();
+
+        if (clients.isEmpty()) {
+            System.out.println("⚠️ No clients found.");
+            return;
+        }
+
+        while (true) {
+            System.out.println("Entre name of Client !");
+            String name = scanner.next();
+            Client client = clients.stream().filter(n -> n.getName().equals(name)).findFirst().orElse(null);
+
+            System.out.println("====================== Client List ======================");
+            System.out.println("ID\tName\t\t\tAddress\t\tEmail");
+            System.out.println("---------------------------------------------------------");
+
+
+            System.out.println(
+                    client.getId() + "\t" +
+                            client.getName() + "\t\t" +
+                            client.getAddress() + "\t\t" +
+                            client.getEmail()
+            );
+            while (true) {
+                System.out.println("=========================================================");
+                System.out.println("1.For update name ");
+                System.out.println("2.For update email");
+                System.out.println("3.For update address");
+                int updateInt = scanner.nextInt();
+                switch (updateInt) {
+                    case 1:
+                        System.out.println("Entre new name :");
+                        break;
+                    case 2:
+                        System.out.println("Entre new email :");
+                        break;
+                    case 3:
+                        System.out.println("Entre new address :");
+                        break;
+                }
+                String value = scanner.next();
+                String res = clientController.updateClient(client.getId(), updateInt, value);
+                System.out.println(res);
+                System.out.println("For out clik B");
+                String out = scanner.next();
+                if (out.equals("B")) {
+                    break;
+                }
+            }
+            System.out.println("For out clik B");
+            String out = scanner.next();
+            if(out.equals("B")){
+                break;
+            }
+        }
 
     }
-    public  static void withdraw(){}
-    public  static void transferInternal(){}
-    public  static void transferExternal(){}
-
     public static int getcount(){
         Optional<ArrayList<Credit>> creditsOptional = Optional.ofNullable(creditController.getcreditsRequest());
 
@@ -287,10 +483,11 @@ public class Main {
 
     }
 
-
-
-
-
-
-
 }
+
+
+
+
+
+
+

@@ -3,7 +3,7 @@ package org.example.Modle;
 public enum TransactionType {
     DEPOSIT,
     WITHDRAW,
-    TRANSFEROUT,
-    TRANSFERIN,
+    TRANSFER_OUT,
+    TRANSFER_IN,
     ETRANGER
 }

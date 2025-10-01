@@ -92,5 +92,71 @@ public class ClientRepository {
             return null;
         }
     }
+    public Client getClientById(int id){
+        String sql = "SELECT * FROM client WHERE id = ?";
+
+        try(Connection connection = JDBC.getConnection()){
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                Client client = new Client();
+                client.setId(rs.getInt("id"));
+                client.setName(rs.getString("name"));
+                client.setAddress(rs.getString("address"));
+                client.setEmail(rs.getString("email"));
+                return client;
+            }
+
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+    public ArrayList<Client> getAllClient() {
+        ArrayList<Client> clients = new ArrayList<>();
+        String sql = "SELECT * FROM client";
+
+        try (Connection connection = JDBC.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Client client = new Client();
+                client.setId(rs.getInt("id"));
+                client.setName(rs.getString("name"));
+                client.setAddress(rs.getString("address"));
+                client.setEmail(rs.getString("email"));
+                clients.add(client);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error fetching clients: " + e.getMessage());
+        }
+
+        return clients;
+    }
+    public boolean updateClient(int id, String column, String value) {
+        String sql = "UPDATE client SET " + column + " = ? WHERE id = ?";
+
+        try (Connection connection = JDBC.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, value); // set new value
+            stmt.setInt(2, id);       // set client ID
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0; // true if at least one row was updated
+
+        } catch (Exception e) {
+            System.out.println("Error updating client: " + e.getMessage());
+            return false;
+        }
+    }
+
+
+
 
 }

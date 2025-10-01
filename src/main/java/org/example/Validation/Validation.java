@@ -28,13 +28,22 @@ public class Validation {
         BigDecimal interest = amount.multiply(new BigDecimal("0.05")).multiply(new BigDecimal(years));
         return interest;
     }
-    public static  boolean isCurrencyInt(Integer currencyInt){
-        if(currencyInt != null && currencyInt>=1 && currencyInt<=3){
+    public static  boolean isInt(Integer numInt){
+            if(numInt != null && numInt.intValue() != 0){
+                return  true;
+            }else{
+                return false;
+            }
+    }
+    public static  boolean isString(String value){
+        if(value != null && !value.isEmpty()){
             return  true;
         }else{
             return false;
         }
     }
+
+
 
 
 
