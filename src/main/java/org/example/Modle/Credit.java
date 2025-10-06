@@ -11,19 +11,19 @@ public class Credit {
     private int durationMonths;
     private CreditStatus status;
     private String linkedAccount;
-    private CurrencyType currencyType;
     private BigDecimal interestRateMonth;
+    private  BigDecimal my_payments;
 
 
-    public Credit(int creditId, BigDecimal amount, BigDecimal interestRate, int durationMonths, CreditStatus status, String linkedAccount, CurrencyType currencyType,BigDecimal interestRateMonth) {
+    public Credit(int creditId, BigDecimal amount, BigDecimal interestRate, int durationMonths, CreditStatus status, String linkedAccount,BigDecimal interestRateMonth, BigDecimal my_payments) {
         this.creditId = creditId;
         this.amount = amount;
         this.interestRate = interestRate;
         this.durationMonths = durationMonths;
         this.status = status;
         this.linkedAccount = linkedAccount;
-        this.currencyType = currencyType;
         this.interestRateMonth = interestRateMonth;
+        this.my_payments = my_payments;
     }
 
     public int getCreditId() {
@@ -50,7 +50,11 @@ public class Credit {
         return linkedAccount;
     }
 
-    public CurrencyType getCurrencyType() {
-        return currencyType;
+    public BigDecimal getMypayments() {
+        return my_payments;
+    }
+
+    public BigDecimal getInterestRateMonth() {
+        return interestRateMonth;
     }
 }

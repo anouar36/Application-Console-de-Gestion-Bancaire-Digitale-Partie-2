@@ -32,6 +32,7 @@ public class ClientRepository {
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
+
                     return rs.getInt(1);
                 }
             }

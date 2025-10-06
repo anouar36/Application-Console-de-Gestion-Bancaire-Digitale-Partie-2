@@ -22,29 +22,29 @@ public class AuthController {
         if(name.length()<4){
             return "please you have error input name";
         }
-        if(email==null || email.contains("@gmail.com") ){
+        if(email==null || !email.contains("@gmail.com") ){
             return "email is failed";
         }
         if(password.length()<6){
             return "Password must be at least 6 characters long.";
         }
-        if(roleInt instanceof  Integer){
+        if(roleInt < 1 || roleInt > 4){
 
-            return "please entre nomber";
+            return "please enter a valid number between 1 and 4";
         }
 
         Role role = switch (roleInt){
-                case 1 -> AUDITOR;
-                case 2 -> TELLER;
-                case 3 -> MANAGER;
-                case 4 -> ADMIN;
-                default -> ADMIN;
+            case 1 -> AUDITOR;
+            case 2 -> TELLER;
+            case 3 -> MANAGER;
+            case 4 -> ADMIN;
+            default -> ADMIN;
         };
 
         boolean rs = this.authService.regester(name,email,password,role);
 
         if (rs) {
-           return name+" "+ role+" ✅  added successfully!";
+            return name+" "+ role+" ✅  added successfully!";
         }else {
             return "⚠  No user was added.";
         }
@@ -52,15 +52,14 @@ public class AuthController {
 
     }
 
-    public String login(String email ,String password){
+    public User login(String email ,String password){
         User userAuth = authService.login(email, password);
 
         if (userAuth == null) {
-            return "please password or email in failed try agen... \n";
+            return null;
         } else {
-            user = userAuth;
+            return user = userAuth;
 
-            return "LOGIN SUCCESSFUL! ✅\n WELCOME "+ userAuth.getRole()+" "+userAuth.getName().toUpperCase() +" TO THE SYSTEM";
         }
     }
 }

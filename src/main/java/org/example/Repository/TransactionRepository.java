@@ -57,19 +57,19 @@ public class TransactionRepository {
                 ResultSet rs = selectStmt.executeQuery();
 
                 if (!rs.next()) {
-                    System.out.println("Account not found!");
                     return false;
                 }
 
                 BigDecimal currentBalance = rs.getBigDecimal("balance");
+
                 if (currentBalance.compareTo(amount) < 0) {
-                    System.out.println("Insufficient balance!");
                     return false;
                 }
 
                 updateStmt.setBigDecimal(1, amount);
                 updateStmt.setString(2, accountNumber);
                 int rowsUpdated = updateStmt.executeUpdate();
+
                 if (rowsUpdated == 0) {
                     connection.rollback();
                     return false;
@@ -80,15 +80,16 @@ public class TransactionRepository {
 
             } catch (Exception e) {
                 connection.rollback();
-                System.out.println("Error during withdrawal: " + e.getMessage());
+                e.printStackTrace();
                 return false;
             }
 
         } catch (Exception e) {
-            System.out.println("Connection error: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
+
 
     public boolean addToHistorique(BigDecimal amount, String clientRib, String receiverRib, String transactionType) {
         String insertSql = "INSERT INTO historique (amount, client_rib, receiver_rib, transaction_type) " +

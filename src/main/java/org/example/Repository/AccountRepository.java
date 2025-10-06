@@ -24,8 +24,8 @@
             this.clientRepository = new ClientRepository();
         }
 
-        public Account creatAccount(BigDecimal balance , AccountType type , Client client, String currency, int id){
-            String sql= "INSERT INTO \"account\" (account_number,balance,type,client,currency) VALUES (?,?,?::account_type,?,?)";
+        public Account creatAccount(BigDecimal balance , AccountType type , Client client, int id){
+            String sql= "INSERT INTO \"account\" (account_number,balance,type,client) VALUES (?,?,?::account_type,?)";
 
             String rib =generateRib ();
 
@@ -36,7 +36,6 @@
                 stmt.setBigDecimal(2,balance);
                 stmt.setString(3,type.name());
                 stmt.setInt(4,id);
-                stmt.setString(5,currency);
 
                 int rs = stmt.executeUpdate();
 
@@ -87,10 +86,8 @@
         }
         public HashMap<String, ArrayList<Account>> listAccounts() {
             HashMap<String, ArrayList<Account>> accountsMap = new HashMap<>();
-
-            String sql = "SELECT a.id as idClient, a.account_number, a.balance, a.type, c.name " +
-                    "FROM account a " +
-                    "JOIN client c ON a.client = c.id;";
+            String sql = "SELECT a.id as idClient, a.account_number, a.balance, a.type, c.name, c.email, c.address " +
+                    "FROM account a JOIN client c ON a.client = c.id;";
 
             try (Connection connection = JDBC.getConnection();
                  PreparedStatement stmt = connection.prepareStatement(sql);
@@ -98,22 +95,23 @@
 
                 while (rs.next()) {
                     int clientId = rs.getInt("idClient");
-                    Client client = clientRepository.getClientById(clientId);
                     String accountNumber = rs.getString("account_number");
                     BigDecimal balance = rs.getBigDecimal("balance");
-                    AccountType type =AccountType.valueOf(rs.getString("type"));
+                    String typeStr = rs.getString("type");
+                    AccountType type = AccountType.valueOf(typeStr);
                     String clientName = rs.getString("name");
-
-                    Account account = new Account(
-                            accountNumber,
-                            balance,
-                            type,
-                            client
-                    );
+                    String clientEmail = rs.getString("email");
+                    String clientAddress = rs.getString("address");
 
 
+                    Client client = new Client();
+                    client.setId(clientId);
+                    client.setName(clientName);
+                    client.setEmail(clientEmail);
+                    client.setAddress(clientAddress);
+
+                    Account account = new Account(accountNumber, balance, type, client);
                     String key = clientName + " (" + clientId + ")";
-
                     accountsMap.putIfAbsent(key, new ArrayList<>());
                     accountsMap.get(key).add(account);
                 }
@@ -124,8 +122,6 @@
 
             return accountsMap;
         }
-        // ضيف هادي في AccountRepository.java
-// بدل الميثود القديمة addSalary()
 
         public boolean addSalary() {
             String sql = "UPDATE account SET balance = balance + 5000";
@@ -134,26 +130,20 @@
 
             try {
                 connection = JDBC.getConnection();
-                // إيقاف AutoCommit باش نتحكمو في الـ Transaction
                 connection.setAutoCommit(false);
 
                 stmt = connection.prepareStatement(sql);
                 int rowsUpdated = stmt.executeUpdate();
 
-                // عمل Commit بعد التحديث
                 connection.commit();
-                System.out.println("✅ تمت إضافة الراتب لـ " + rowsUpdated + " حساب");
                 return true;
 
             } catch (SQLException e) {
-                System.err.println("❌ خطأ في إضافة الراتب: " + e.getMessage());
                 e.printStackTrace();
 
-                // إلغاء التغييرات في حالة الخطأ
                 if (connection != null) {
                     try {
                         connection.rollback();
-                        System.out.println("⚠️ تم التراجع عن التغييرات");
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
@@ -161,7 +151,6 @@
                 return false;
 
             } finally {
-                // ⭐ مهم جداً: إغلاق الموارد باش ما يكونش Memory Leak
                 if (stmt != null) {
                     try {
                         stmt.close();
@@ -180,4 +169,83 @@
                 }
             }
         }
+
+        public boolean accountAmount(String accountNumber) {
+            String sql = "SELECT balance FROM account WHERE account_number = ?";
+            try (Connection connection = JDBC.getConnection();
+                 PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+                stmt.setString(1, accountNumber);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    BigDecimal balance = rs.getBigDecimal("balance");
+
+                    if (balance.compareTo(BigDecimal.ZERO) > 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+
+            } catch (SQLException e) {
+                return false;
+            }
+        }
+
+
+        public boolean accountCredit(String accountNumber) {
+            String sql = "SELECT amount, my_payments FROM credit WHERE linked_account = ?";
+
+            try (Connection connection = JDBC.getConnection();
+                 PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+                stmt.setString(1, accountNumber);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    BigDecimal amount = rs.getBigDecimal("amount");
+                    BigDecimal myPayments = rs.getBigDecimal("my_payments");
+
+                    if (amount.compareTo(myPayments) > 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    // No credit found for this account
+                    return true;
+                }
+
+            } catch (SQLException e) {
+                return false;
+            }
+        }
+
+
+        public boolean closeAccount(String accountNumber) {
+            String sql = "DELETE FROM account WHERE account_number = ?";
+            try (Connection connection = JDBC.getConnection();
+                 PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+                stmt.setString(1, accountNumber);
+                int rows = stmt.executeUpdate();
+
+                if (rows > 0) {
+                    System.out.println("[INFO] Account " + accountNumber + " closed successfully.");
+                    return true;
+                } else {
+                    System.out.println("[WARN] No account found to close with number: " + accountNumber);
+                    return false;
+                }
+
+            } catch (SQLException e) {
+                System.err.println("[ERROR] closeAccount(): " + e.getMessage());
+                return false;
+            }
+        }
+
+
     }

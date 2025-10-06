@@ -1,8 +1,10 @@
 package org.example.Service;
 
+import org.example.Modle.BankHistorique;
 import org.example.Repository.BankRepository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 public class BankService {
 
@@ -13,5 +15,8 @@ public class BankService {
     }
     public boolean addFee(BigDecimal fee){
         return bankRepository.addFee(fee);
+    }
+    public ArrayList<BankHistorique> getAllBankHistorique(){
+        return bankRepository.getAllBankHistorique();
     }
 }

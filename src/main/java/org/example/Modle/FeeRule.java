@@ -3,16 +3,15 @@ package org.example.Modle;
 import java.math.BigDecimal;
 
 public class FeeRule {
-     private String mode;
-     private String operationType;
-     private BigDecimal value;
-     private String currency;
+    private String mode;
+    private String operationType;
+    private BigDecimal value;
 
-    public FeeRule(String mode, String operationType, BigDecimal value, String currency) {
+
+    public FeeRule(String mode, String operationType, BigDecimal value) {
         this.mode = mode;
         this.operationType = operationType;
         this.value = value;
-        this.currency = currency;
     }
 
     public String getMode() {
@@ -27,9 +26,6 @@ public class FeeRule {
         return value;
     }
 
-    public String getCurrency() {
-        return currency;
-    }
 
     public void setMode(String mode) {
         this.mode = mode;
@@ -43,7 +39,4 @@ public class FeeRule {
         this.value = value;
     }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
 }

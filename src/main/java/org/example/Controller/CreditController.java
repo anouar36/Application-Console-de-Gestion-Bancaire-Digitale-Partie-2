@@ -7,6 +7,7 @@ import org.example.Validation.Validation;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 public class CreditController {
@@ -16,15 +17,10 @@ public class CreditController {
         this.creditService = new CreditService();
     }
 
-    public String creditRequest(double linkedAccount, BigDecimal amount,int durationMonths){
-        CurrencyType currencyType ;
+    public String creditRequest(String linkedAccount, BigDecimal amount, BigDecimal salary, Date dateStart){
 
 
-        int years = durationMonths / 12;
-        BigDecimal interestRate = Validation.interestRate(amount,years);
-        BigDecimal interestRateMonth = interestRate.divide(new BigDecimal(durationMonths),4,BigDecimal.ROUND_UP);
-
-            boolean rs = creditService.creditRequest(linkedAccount,amount,interestRate,interestRateMonth,durationMonths);
+            boolean rs = creditService.creditRequest(linkedAccount,amount,salary,dateStart);
 
             if (rs){
                 return "Your request has been processed";
@@ -45,6 +41,7 @@ public class CreditController {
         }
 
     }
+
 
 
 }

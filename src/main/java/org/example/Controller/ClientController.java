@@ -10,32 +10,43 @@ public class ClientController {
 
     private ClientService clientService ;
     private Client client;
+    
     public ClientController() {
         this.clientService = new ClientService();
         this.client = new Client();
 
     }
+    public Client addClient(String name, String email, String address) {
 
-    public String addClient(String name, String email, String address){
+        if (!Validation.isName(name)) {
+            System.out.println(" please enter a valid name");
+            return null;
+        }
+        if (!Validation.isGmail(email)) {
+            System.out.println(" please enter a valid email");
+            return null;
+        }
+        if (!Validation.isAddresse(address)) {
+            System.out.println(" please enter a valid address");
+            return null;
+        }
 
-        if(!Validation.isName(name)){
-            return "please entre true name";
-        }
-        if(!Validation.isGmail(email)){
-            return "please entre true email";
-        }
-        if(!Validation.isAddresse(address)){
-            return "entre true address";
-        }
         Integer res = clientService.addClient(name, email, address);
-        if (res != null) {
-            client.setId(res);
-            return name + " Has been added successfully.✅";
-        } else {
-            return "Was not added successfully";
-        }
 
+        if (res != null) {
+            Client client = new Client();
+            client.setId(res);
+            client.setName(name);
+            client.setEmail(email);
+            client.setAddress(address);
+
+            return client;
+        } else {
+
+            return null;
+        }
     }
+
     public Client getClient(String name,String email){
         return clientService.getClient(name,email);
     }

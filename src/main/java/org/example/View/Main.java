@@ -2,11 +2,13 @@ package org.example.View;
 
 import org.example.Controller.*;
 import org.example.Modle.*;
-import org.example.Validation.SalaryJob;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
+import org.example.Service.SalaryJob;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,41 +20,55 @@ public class Main {
     private static AccountController accountController = new AccountController();
     private static CreditController creditController = new CreditController();
     private static TransactionController transactionController = new TransactionController();
+    private static BankController bankController = new BankController();
+    private static  RapportController rapportController = new RapportController();
 
 
 
-    public static void main(String[] args) {
-        //while (true) {
+    public static void main(String[] args) throws Exception {
+        SalaryJob.startScheduler();
 
-            //     System.out.println("===================================");
-            //     System.out.println("      WELCOME TO BANK SYSTEM       ");
-            //    System.out.println("===================================");
+        while (true) {
 
-            //     System.out.println("pleas entre your email user:");
-            //     String email = scanner.next();
+            System.out.println("===================================");
+            System.out.println("      WELCOME TO BANK SYSTEM       ");
+            System.out.println("===================================");
 
-            //    System.out.println("pleas entre your password user:");
-            //    String password = scanner.next();
+            System.out.println("pleas entre your email user:");
+            String email = scanner.next();
 
-            //     String userAuth = authController.login(email, password);
-            //    System.out.println("===================================");
-            //     System.out.println("      " + userAuth + "      ");
-            //     System.out.println("===================================");
+            System.out.println("pleas entre your password user:");
+            String password = scanner.next();
 
-            //    if (userAuth.toUpperCase().contains("ADMIN")) {
-                //         adminMenu();
-                //    } else {
-                //        System.out.println("SORRY YOU ARE OUT AT SYSTEM!\n");
-                //     }
+            User userAuth = authController.login(email, password);
+            user = userAuth;
 
-       //}
-        try {
-            // تشغيل Scheduler مع البرنامج
-            SalaryJob.startScheduler();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            if (userAuth == null) {
+                System.out.println("SORRY YOU ARE OUT AT SYSTEM!\n");
+
+
+            }else{
+
+                System.out.println("===================================");
+                System.out.println("      " + "LOGIN SUCCESSFUL! ✅\n WELCOME " + userAuth.getRole() + " " + userAuth.getName().toUpperCase() + " TO THE SYSTEM" + "      ");
+                System.out.println("===================================");
+
+                switch (userAuth.getRole()) {
+                    case Role.ADMIN  -> adminMenu();
+                    case Role.AUDITOR-> auditorMenu();
+                    case Role.MANAGER-> managerMenu();
+                    case Role.TELLER ->  tellerMenu();
+
+                }
+            }
+
         }
-            adminMenu();
+
+
+
+
+
     }
 
     //admin menu
@@ -69,7 +85,7 @@ public class Main {
             System.out.println("8  . Withdraw");
             System.out.println("9  . Transfer Internal");
             System.out.println("10 . Transfer External");
-            System.out.println("11 . List Accounts");
+            System.out.println(" 11 . List Accounts");
             System.out.println("12 . Update Client Profile");
             System.out.println("13 . Close Account");
             System.out.println("14 . Transaction History");
@@ -132,11 +148,11 @@ public class Main {
                     navigate();
                     break;
                 case 13:
-                    //closeAccount();
+                    closeAccount();
                     navigate();
                     break;
                 case 14:
-                    //transactionHistory();
+                    transactionHistory();
                     navigate();
                     break;
                 case 15:
@@ -148,7 +164,7 @@ public class Main {
                     navigate();
                     break;
                 case 17:
-                    //reportsAndStatistics();
+                    reportsAndStatistics();
                     navigate();
                     break;
                 case 18:
@@ -166,6 +182,108 @@ public class Main {
             }
         }
     }
+    //teller  menu
+    public static void tellerMenu() {
+        while (true) {
+            System.out.println("========= TELLER MENU =========");
+            System.out.println("1  . Show Profile");
+            System.out.println("2  . Create Client");
+            System.out.println("3  . Create Account");
+            System.out.println("4  . Deposit");
+            System.out.println("5  . Withdraw");
+            System.out.println("6  . Transfer Internal");
+            System.out.println("7  . Credit Request");
+            System.out.println("8  . Transaction History");
+            System.out.println("9  . Logout");
+            System.out.println("10 . Exit");
+            System.out.print("Please enter your choice: ");
+
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1: showProfile(); break;
+                case 2: creatClient(); break;
+                case 3: creatAccont(); break;
+                case 4: deposit(); break;
+                case 5: withdraw(); break;
+                case 6: transferInternal(); break;
+                case 7: creditRequest(); break;
+                case 8: transactionHistory(); break;
+                case 9: return; // logout
+                case 10: System.exit(0); break;
+                default: System.out.println("Invalid choice!");
+            }
+            navigate();
+        }
+    }
+    //manager menu
+    public static void managerMenu() {
+        while (true) {
+            System.out.println("========= MANAGER MENU =========");
+            System.out.println("1  . Show Profile");
+            System.out.println("2  . Create Client");
+            System.out.println("3  . Create Account");
+            System.out.println("4  . Deposit");
+            System.out.println("5  . Withdraw");
+            System.out.println("6  . Transfer Internal");
+            System.out.println("7  . Transfer External");
+            System.out.println("8  . Credit Request");
+            System.out.println("9  . Validation Credit : (" + getcount() + ")");
+            System.out.println("10 . Close Account");
+            System.out.println("11 . Transaction History");
+            System.out.println("12 . Reports & Statistics");
+            System.out.println("13 . Logout");
+            System.out.println("14 . Exit");
+            System.out.print("Please enter your choice: ");
+
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1: showProfile(); break;
+                case 2: creatClient(); break;
+                case 3: creatAccont(); break;
+                case 4: deposit(); break;
+                case 5: withdraw(); break;
+                case 6: transferInternal(); break;
+                case 7: transferExternal(); break;
+                case 8: creditRequest(); break;
+                case 9: validationCredit(); break;
+                case 10: closeAccount(); break;
+                case 11: transactionHistory(); break;
+                case 12: /* reportsAndStatistics(); */ break;
+                case 13: return; // logout
+                case 14: System.exit(0); break;
+                default: System.out.println("Invalid choice!");
+            }
+            navigate();
+        }
+    }
+    //auditor menu
+    public static void auditorMenu() {
+        while (true) {
+            System.out.println("========= AUDITOR MENU =========");
+            System.out.println("1  . Show Profile");
+            System.out.println("2  . List Accounts");
+            System.out.println("3  . Transaction History");
+            System.out.println("4  . Reports & Statistics");
+            System.out.println("5  . Logout");
+            System.out.println("6  . Exit");
+            System.out.print("Please enter your choice: ");
+
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1: showProfile(); break;
+                case 2: listAccounts(); break;
+                case 3: transactionHistory(); break;
+                case 4: /* reportsAndStatistics(); */ break;
+                case 5: return; // logout
+                case 6: System.exit(0); break;
+                default: System.out.println("Invalid choice!");
+            }
+            navigate();
+        }
+
+
+}
+
 
 
     public static void navigate() {
@@ -218,9 +336,19 @@ public class Main {
             System.out.println("entre adress: ");
             String adress = scanner.next();
 
-            String res = clientController.addClient(name, email, adress);
-            if (res.contains("Was not added successfully")) {
+
+
+            Client res = clientController.addClient(name, email, adress);
+
+            if (res != null) {
+                System.out.println( name + " has been added successfully.");
+
+
+            }else{
                 index++;
+                System.out.println("Client was not added successfully.");
+
+
             }
         }
 
@@ -241,7 +369,10 @@ public class Main {
             String email = scanner.next();
             Client client = clientController.getClient(name, email);
             if (client == null) {
-                clientController.addClient(name, email, null);
+                System.out.println("Enter address of client:");
+                String address = scanner.next();
+                client = clientController.addClient(name, email, address);
+
             }
             System.out.println("Entre balance of acount:");
             BigDecimal balance = scanner.nextBigDecimal();
@@ -258,33 +389,43 @@ public class Main {
         }
     }
     public static void creditRequest() {
-        int index =0;
-        String  out = "";
+        int index = 0;
+        String out = "";
         while (true) {
-            if(index!=0){
+            if (index != 0) {
                 System.out.println("For out click B");
-                out="B";
+                out = scanner.next();
             }
-            if(out.equals("B")){
+            if (out.equals("B")) {
                 break;
             }
+            System.out.println("When you take a credit, 40% of your salary will be deducted.");
+            System.out.println("================================================================");
 
-            System.out.print("Enter RIB: ");
-            double linkedAccount = scanner.nextDouble();
+            System.out.println("Enter RIB: ");
+            String linkedAccount = scanner.next();
 
-            System.out.print("Enter Amount: ");
+            System.out.println("Enter Salary: ");
+            BigDecimal salary = scanner.nextBigDecimal();
+
+            System.out.println("Enter Amount Credit: ");
             BigDecimal amount = scanner.nextBigDecimal();
 
-            System.out.print("Enter the loan duration (in months): ");
-            int durationMonths = scanner.nextInt();
+            scanner.nextLine();
+            System.out.println("Enter Date Start (yyyy-MM-dd): ");
+            String dateInput = scanner.nextLine();
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(dateInput, formatter);
+            Date dateStart = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-            index ++;
+            index++;
 
-            String rs = creditController.creditRequest(linkedAccount, amount, durationMonths);
+            String rs = creditController.creditRequest(linkedAccount, amount, salary, dateStart);
             System.out.println(rs);
         }
     }
+
     public static void validationCredit(){
         ArrayList<Credit> credits =creditController.getcreditsRequest();
         credits.forEach(credit -> {
@@ -292,7 +433,6 @@ public class Main {
             System.out.println("Amount           : " + credit.getAmount());
             System.out.println("Linked Account   : " + credit.getLinkedAccount());
             System.out.println("Duration (Months): " + credit.getDurationMonths());
-            System.out.println("Currency Type    : " + credit.getCurrencyType());
             System.out.println("Interest Rate    : " + credit.getInterestRate());
             System.out.println("Status           : " + credit.getStatus());
             System.out.println("--------------------------------------------------");
@@ -476,6 +616,78 @@ public class Main {
         }
 
     }
+    public static void closeAccount(){
+        listAccounts();
+        System.out.println("Entre RIB of acount to close !");
+        String rib = scanner.next();
+        String result = accountController.closeAccount(rib);
+        System.out.println(result);
+    }
+    public static void transactionHistory() {
+        ArrayList<BankHistorique> bankHistoriques = bankController.getAllBankHistorique();
+
+        if (bankHistoriques.isEmpty()) {
+            System.out.println("No bank history records found.");
+            return;
+        }
+
+        for (BankHistorique bh : bankHistoriques) {
+            System.out.println("ID: " + bh.getId());
+            System.out.println("Client ID: " + bh.getIdClient());
+            System.out.println("Account: " + bh.getLinkedAccount());
+            System.out.println("Interest Month: " + bh.getInterestRateMonth());
+            System.out.println("Interest Rate: " + bh.getInterestRate());
+            System.out.println("My Payments: " + bh.getMyPayments());
+            System.out.println("Created At: " + bh.getCreatedAt());
+            System.out.println("-------------------------------");
+        }
+    }
+    public static void reportsAndStatistics() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("========= CREATE CREDIT REPORT =========");
+
+        System.out.print("Enter report title: ");
+        String reportName = scanner.nextLine();
+
+        System.out.print("Enter your name: ");
+        String authorName = scanner.nextLine();
+
+        System.out.print("Enter credit status (e.g. ACTIVE, LATE, CLOSED): ");
+        String creditStatus = scanner.nextLine();
+
+        System.out.print("Enter short description: ");
+        String description = scanner.nextLine();
+
+        LocalDate reportDate = LocalDate.now();
+
+        // ✅ Create static text template for the report
+        String reportText = "========= CREDIT REPORT =========\n" +
+                "Report Title : " + reportName + "\n" +
+                "Author       : " + authorName + "\n" +
+                "Date         : " + reportDate + "\n" +
+                "Status       : " + creditStatus + "\n" +
+                "--------------------------------------\n" +
+                "Summary : \n" + description + "\n\n" +
+                "This report summarizes the current state of credit operations.\n" +
+                "It provides details about loan performance, repayment status,\n" +
+                "and client reliability metrics based on the entered credit status.\n" +
+                "--------------------------------------\n" +
+                "Generated automatically by the Digital Banking System.\n" +
+                "========= END OF REPORT =========";
+
+        // ✅ Create report object
+        Rapport report = new Rapport(reportName, authorName, reportDate, creditStatus, description, reportText);
+
+        // ✅ Save to database
+        rapportController.saveReport(report);
+
+        // ✅ Print confirmation
+        System.out.println("\nReport successfully created and saved!");
+        System.out.println("=======================================");
+        System.out.println(reportText);
+        System.out.println("=======================================");
+    }
+
     public static int getcount(){
         Optional<ArrayList<Credit>> creditsOptional = Optional.ofNullable(creditController.getcreditsRequest());
 
